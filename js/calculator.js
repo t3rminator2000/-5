@@ -1,127 +1,97 @@
 /**
- * Калькулятор стоимости обучения
- * Формула: базовая_цена_за_минуту × продолжительность × кол-во_занятий × коэффициент_тарифа
+ * calculator.js
+ * Калькулятор стоимости обучения (courses.html).
+ * Расчёт больше не делается в браузере — при изменении любого поля
+ * данные уходят на сервер (POST /api/calculate), а результат приходит оттуда.
+ *
+ * Разметка (courses.html):
+ * <form id="calc-form">
+ *   <input id="lessons-count" type="number" ...>
+ *   <select id="lesson-duration">...</select>
+ *   <input type="radio" name="tariff" value="1.0" ...>
+ * </form>
+ * <div class="calculator__result">
+ *   Итоговая стоимость: <span id="total-price">0</span> ₽
+ * </div>
+ *
+ * Подключать после js/api.js.
  */
 
-(function () {
-    'use strict';
+document.addEventListener('DOMContentLoaded', () => {
+  const form = document.getElementById('calc-form');
+  const resultEl = document.getElementById('total-price');
+  if (!form || !resultEl) return;
 
-    // Базовая цена за минуту (руб)
-    const BASE_PRICE_PER_MINUTE = 30;
+  const resultBlock = resultEl.closest('.calculator__result');
+  const lessonsInput = document.getElementById('lessons-count');
+  const durationSelect = document.getElementById('lesson-duration');
 
-    // DOM-элементы
-    const form = document.getElementById('calc-form');
-    const lessonsCountInput = document.getElementById('lessons-count');
-    const lessonDurationSelect = document.getElementById('lesson-duration');
-    const tariffRadios = document.querySelectorAll('input[name="tariff"]');
-    const totalPriceElement = document.getElementById('total-price');
+  let debounceTimer = null;
+  let requestId = 0; // защита от «гонки» ответов, если предыдущий запрос ещё не вернулся
 
-    /**
-     * Получает выбранный коэффициент тарифа
-     * @returns {number}
-     */
-    function getTariffCoefficient() {
-        const selected = document.querySelector('input[name="tariff"]:checked');
-        return selected ? parseFloat(selected.value) : 1.0;
+  function getTariff() {
+    const checked = form.querySelector('input[name="tariff"]:checked');
+    return checked ? Number(checked.value) : 1.0;
+  }
+
+  async function recalculate() {
+    const lessonsCount = Number(lessonsInput.value);
+    const duration = Number(durationSelect.value);
+    const tariff = getTariff();
+
+    if (!lessonsCount || lessonsCount < 1) {
+      resultEl.textContent = '0';
+      return;
     }
 
-    /**
-     * Получает количество занятий
-     * @returns {number}
-     */
-    function getLessonsCount() {
-        const value = parseInt(lessonsCountInput.value, 10);
-        return isNaN(value) || value < 1 ? 1 : value;
-    }
+    const currentRequest = ++requestId;
+    setLoading(true);
 
-    /**
-     * Получает длительность занятия в минутах
-     * @returns {number}
-     */
-    function getLessonDuration() {
-        const value = parseInt(lessonDurationSelect.value, 10);
-        return isNaN(value) || value < 1 ? 60 : value;
-    }
+    const result = await calculatePrice({ lessonsCount, duration, tariff });
 
-    /**
-     * Форматирует число с пробелами (1000 → 1 000)
-     * @param {number} num
-     * @returns {string}
-     */
-    function formatNumber(num) {
-        return Math.round(num).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
-    }
+    // если пользователь успел изменить поля ещё раз — этот ответ уже неактуален
+    if (currentRequest !== requestId) return;
+    setLoading(false);
 
-    /**
-     * Основной расчёт стоимости
-     */
-    function calculateTotal() {
-        const lessonsCount = getLessonsCount();
-        const duration = getLessonDuration();
-        const tariff = getTariffCoefficient();
-
-        const total = BASE_PRICE_PER_MINUTE * duration * lessonsCount * tariff;
-
-        // Анимация изменения числа
-        animateValue(totalPriceElement, total, 400);
-    }
-
-    /**
-     * Анимация плавного изменения числа
-     * @param {HTMLElement} element
-     * @param {number} endValue
-     * @param {number} duration - длительность анимации в мс
-     */
-    function animateValue(element, endValue, duration) {
-        const startValue = parseInt(element.textContent.replace(/\s/g, ''), 10) || 0;
-        const range = endValue - startValue;
-        const startTime = performance.now();
-
-        function update(currentTime) {
-            const elapsed = currentTime - startTime;
-            const progress = Math.min(elapsed / duration, 1);
-
-            // Функция плавности (ease-out)
-            const easeOut = 1 - Math.pow(1 - progress, 3);
-            const currentValue = startValue + range * easeOut;
-
-            element.textContent = formatNumber(currentValue);
-
-            if (progress < 1) {
-                requestAnimationFrame(update);
-            }
-        }
-
-        requestAnimationFrame(update);
-    }
-
-    /**
-     * Навешивает обработчики событий на все поля формы
-     */
-    function bindEvents() {
-        // Изменение количества занятий
-        lessonsCountInput.addEventListener('input', calculateTotal);
-
-        // Изменение длительности
-        lessonDurationSelect.addEventListener('change', calculateTotal);
-
-        // Изменение тарифа
-        tariffRadios.forEach(radio => {
-            radio.addEventListener('change', calculateTotal);
-        });
-    }
-
-    // Инициализация при загрузке
-    function init() {
-        bindEvents();
-        calculateTotal();
-    }
-
-    // Запуск после полной загрузки DOM
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', init);
+    if (result.success) {
+      resultEl.textContent = result.data.totalPrice;
+      if (resultBlock) {
+        resultBlock.classList.remove('calculator__result--error');
+        resultBlock.removeAttribute('title');
+      }
     } else {
-        init();
+      resultEl.textContent = '—';
+      if (resultBlock) {
+        resultBlock.classList.add('calculator__result--error');
+        resultBlock.title = result.error;
+      }
     }
+  }
 
-})();
+  function setLoading(isLoading) {
+    if (isLoading) resultEl.textContent = '…';
+    if (resultBlock) resultBlock.classList.toggle('calculator__result--loading', isLoading);
+  }
+
+  // Число занятий — пересчитываем с небольшой задержкой, чтобы не слать запрос на каждый ввод символа
+  lessonsInput.addEventListener('input', () => {
+    clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(recalculate, 400);
+  });
+
+  // Длительность и тариф меняются кликом/выбором — пересчитываем сразу
+  durationSelect.addEventListener('change', recalculate);
+  form.querySelectorAll('input[name="tariff"]').forEach((radio) => {
+    radio.addEventListener('change', recalculate);
+  });
+
+  // На случай нажатия Enter внутри формы (нет кнопки submit, но подстрахуемся)
+  form.addEventListener('submit', (event) => {
+    event.preventDefault();
+    clearTimeout(debounceTimer);
+    recalculate();
+  });
+
+  // Первичный расчёт при загрузке страницы (по значениям формы по умолчанию)
+  recalculate();
+});
