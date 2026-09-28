@@ -1,51 +1,72 @@
+/**
+ * slider.js
+ * Слайдер отзывов на index.html.
+ *
+ * Отзывы теперь подгружаются с сервера (js/reviews.js) уже после загрузки страницы,
+ * поэтому карточки и точки нельзя запоминать один раз при старте — каждый раз
+ * берём актуальные элементы из DOM. Когда reviews.js обновляет разметку,
+ * он отправляет событие "reviews:updated", и слайдер сбрасывается на первый отзыв.
+ */
+
 document.addEventListener("DOMContentLoaded", () => {
-    const reviews = document.querySelectorAll(".review-card");
     const prevButton = document.querySelector(".reviews__button--prev");
     const nextButton = document.querySelector(".reviews__button--next");
-    const dots = document.querySelectorAll(".reviews__dot");
+    const dotsContainer = document.querySelector(".reviews__dots");
+
+    if (!prevButton || !nextButton) return;
 
     let currentIndex = 0;
 
+    const getCards = () => document.querySelectorAll(".review-card");
+    const getDots = () => document.querySelectorAll(".reviews__dot");
+
     function showReview(index) {
-        reviews.forEach((review, i) => {
-            review.classList.toggle("review-card--active", i === index);
+        getCards().forEach((card, i) => {
+            card.classList.toggle("review-card--active", i === index);
         });
 
-        dots.forEach((dot, i) => {
+        getDots().forEach((dot, i) => {
             dot.classList.toggle("reviews__dot--active", i === index);
         });
     }
 
     function nextReview() {
-        currentIndex++;
+        const total = getCards().length;
+        if (!total) return;
 
-        if (currentIndex >= reviews.length) {
-            currentIndex = 0;
-        }
-
+        currentIndex = (currentIndex + 1) % total;
         showReview(currentIndex);
     }
 
     function previousReview() {
-        currentIndex--;
+        const total = getCards().length;
+        if (!total) return;
 
-        if (currentIndex < 0) {
-            currentIndex = reviews.length - 1;
-        }
-
+        currentIndex = (currentIndex - 1 + total) % total;
         showReview(currentIndex);
     }
 
     prevButton.addEventListener("click", previousReview);
     nextButton.addEventListener("click", nextReview);
 
-    dots.forEach((dot, index) => {
-        dot.addEventListener("click", () => {
-            currentIndex = index;
+    // Клики по точкам — через делегирование, чтобы работали и после перерисовки точек
+    if (dotsContainer) {
+        dotsContainer.addEventListener("click", (event) => {
+            const dot = event.target.closest(".reviews__dot");
+            if (!dot) return;
+
+            currentIndex = Array.from(getDots()).indexOf(dot);
             showReview(currentIndex);
         });
+    }
+
+    // reviews.js обновил карточки и точки — начинаем с первого отзыва
+    document.addEventListener("reviews:updated", () => {
+        currentIndex = 0;
+        showReview(currentIndex);
     });
 
     showReview(currentIndex);
 });
+
 
