@@ -195,17 +195,21 @@
             <div class="form-group">
                 <label class="form-label" for="course">Курс *</label>
                 <select id="course" class="form-input" required>
-                    <option value="">Выберите курс</option>
-                    <option value="english">Английский А1 - С2</option>
-                    <option value="german">Немецкий А1 - С1</option>     
-                    <option value="france">Французский А1 - С1</option>
-                    <option value="spain">Испанский А1 - С1</option>
-                    <option value="italian">Итальянский А1 - В2</option>
-                    <option value="china">Китайский HSK 1 -5 </option>
-                    <option value="japanese">Японский N5 - N3</option>  
-                    <option value="russian">Русский (для иностранца) A1 - C1</option> 
+                    <option value="">Загрузка курсов...</option>
                 </select>
                 <div class="error-message" id="courseError">Выберите курс</div>
+            </div>
+
+            <!-- Дата занятия -->
+            <div class="form-group">
+                <label class="form-label" for="date">Дата занятия *</label>
+                <input
+                    type="date"
+                    id="date"
+                    class="form-input"
+                    required
+                >
+                <div class="error-message" id="dateError">Выберите дату занятия</div>
             </div>
 
             <!-- Чекбокс согласия -->
@@ -223,6 +227,7 @@
 
             <!-- Кнопка отправки -->
             <button type="submit" class="submit-btn" disabled>Записаться</button>
+            <p id="formStatus" style="display: none; margin-top: 15px; text-align: center;"></p>
         </form>
     </div>
 
@@ -271,158 +276,8 @@
         </div>
     </footer>
 
-    <script>
-        // Получаем элементы формы
-        const form = document.getElementById('bookingForm');
-        const fullNameInput = document.getElementById('fullName');
-        const phoneInput = document.getElementById('phone');
-        const emailInput = document.getElementById('email');
-        const courseInput = document.getElementById('course');
-        const privacyCheckbox = document.getElementById('privacyAgree');
-        const submitBtn = document.querySelector('.submit-btn');
-        const formInputs = form.querySelectorAll('.form-input[required]');
-
-        // Маска для телефона
-        phoneInput.addEventListener('input', function(e) {
-            // Оставляем только цифры
-            let value = e.target.value.replace(/\D/g, '');
-            // Форматируем под нужный шаблон
-            let formattedValue = '';
-
-            if (value.startsWith('8')) {
-                value = value.replace('8', '7');
-            } else if (!value.startsWith('7')) {
-                value = '7' + value;
-            }
-
-            // Строим маску
-            if (value.length >= 1) formattedValue = `+${value[0]}`;
-            if (value.length >= 2) formattedValue += `(${value.substring(1, 4)}`;
-            if (value.length >= 4) formattedValue += `)-${value.substring(4, 7)}`;
-            if (value.length >= 7) formattedValue += `-${value.substring(7, 9)}`;
-            if (value.length >= 9) formattedValue += `-${value.substring(9, 11)}`;
-
-            // Ограничиваем длину
-            if (formattedValue.length > 18) {
-                formattedValue = formattedValue.substring(0, 18);
-            }
-
-            e.target.value = formattedValue;
-        });
-
-        // Активация кнопки при согласии на обработку данных
-        privacyCheckbox.addEventListener('change', function() {
-            submitBtn.disabled = !this.checked;
-        });
-
-        // Валидация Email
-        function validateEmail(email) {
-            const regex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
-            return regex.test(email);
-        }
-
-        // Универсальная функция для показа ошибок
-        function showError(input, errorElementId, message) {
-            input.classList.add('error');
-            const errorElement = document.getElementById(errorElementId);
-            errorElement.textContent = message;
-            errorElement.style.display = 'block';
-        }
-
-        function hideError(input, errorElementId) {
-            input.classList.remove('error');
-            const errorElement = document.getElementById(errorElementId);
-            errorElement.style.display = 'none';
-        }
-
-        // Валидация полей при вводе
-        formInputs.forEach(input => {
-            input.addEventListener('blur', function() {
-                switch(this.id) {
-                    case 'fullName':
-                        if (this.value.trim().length < 3) {
-                            showError(this, 'fullNameError', 'Введите корректное ФИО (минимум 3 символа)');
-                        } else {
-                            hideError(this, 'fullNameError');
-                        }
-                        break;
-                    case 'phone':
-                        if (this.value.length !== 17) {
-                            showError(this, 'phoneError', 'Введите телефон в формате +7(XXX)-XXX-XX-XX');
-                        } else {
-                            hideError(this, 'phoneError');
-                        }
-                        break;
-                    case 'course':
-                        if (!this.value) {
-                            showError(this, 'courseError', 'Выберите курс');
-                        } else {
-                            hideError(this, 'courseError');
-                        }
-                        break;
-                }
-            });
-        });
-
-        // Валидация Email при вводе
-        emailInput.addEventListener('blur', function() {
-            if (this.value && !validateEmail(this.value)) {
-                showError(this, 'emailError', 'Введите корректный адрес электронной почты');
-            } else {
-                hideError(this, 'emailError');
-            }
-        });
-
-        // Общая валидация при отправке формы
-        form.addEventListener('submit', function(e) {
-            e.preventDefault();
-            let isValid = true;
-
-            // Проверка ФИО
-            if (fullNameInput.value.trim().length < 3) {
-                showError(fullNameInput, 'fullNameError', 'Введите корректное ФИО (минимум 3 символа)');
-                isValid = false;
-            } else {
-                hideError(fullNameInput, 'fullNameError');
-            }
-
-            // Проверка телефона
-            if (phoneInput.value.length !== 17) {
-                showError(phoneInput, 'phoneError', 'Введите телефон в формате +7(XXX)-XXX-XX-XX');
-                isValid = false;
-            } else {
-                hideError(phoneInput, 'phoneError');
-            }
-
-            // Проверка курса
-            if (!courseInput.value) {
-                showError(courseInput, 'courseError', 'Выберите курс');
-                isValid = false;
-            } else {
-                hideError(courseInput, 'courseError');
-            }
-
-            // Проверка Email (если заполнен)
-            if (emailInput.value && !validateEmail(emailInput.value)) {
-                showError(emailInput, 'emailError', 'Введите корректный адрес электронной почты');
-                isValid = false;
-            } else {
-                hideError(emailInput, 'emailError');
-            }
-
-            // Проверка согласия
-            if (!privacyCheckbox.checked) {
-                submitBtn.disabled = true;
-                isValid = false;
-            }
-
-            // Если всё корректно - отправляем форму
-            if (isValid) {
-                alert('Запись успешно отправлена! Мы скоро свяжемся с вами.');
-                form.reset();
-                submitBtn.disabled = true;
-            }
-        });
-    </script>
+    <script src="js/api.js"></script>
+    <script src="js/courses.js"></script>
+    <script src="js/booking.js"></script>
 </body>
 </html>

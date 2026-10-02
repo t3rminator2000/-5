@@ -57,120 +57,8 @@
                 </div>
 
                 <!-- Вариант 10: сетка каталога курсов -->
-                <div class="courses__grid">
-
-                    <article class="course-card">
-                        <div class="course-card__image course-card__image--english">
-                            <span>🇬🇧</span>
-                        </div>
-                        <div class="course-card__content">
-                            <h2 class="course-card__title">Английский</h2>
-                            <p class="course-card__description">
-                                От базовой грамматики до свободного общения.
-                                Программа подбирается под ваш уровень.
-                            </p>
-                            <p class="course-card__price">Уровни A1 — C2</p>
-                        </div>
-                    </article>
-
-                    <article class="course-card">
-                        <div class="course-card__image course-card__image--english">
-                            <span>🇩🇪</span>
-                        </div>
-                        <div class="course-card__content">
-                            <h2 class="course-card__title">Немецкий</h2>
-                            <p class="course-card__description">
-                                Грамматика, произношение и разговорная практика
-                                с носителями языка.
-                            </p>
-                            <p class="course-card__price">Уровни A1 — C1</p>
-                        </div>
-                    </article>
-
-                    <article class="course-card">
-                        <div class="course-card__image course-card__image--english">
-                            <span>🇫🇷</span>
-                        </div>
-                        <div class="course-card__content">
-                            <h2 class="course-card__title">Французский</h2>
-                            <p class="course-card__description">
-                                Живой французский для путешествий, работы
-                                и повседневного общения.
-                            </p>
-                            <p class="course-card__price">Уровни A1 — C1</p>
-                        </div>
-                    </article>
-
-                    <article class="course-card">
-                        <div class="course-card__image course-card__image--english">
-                            <span>🇪🇸</span>
-                        </div>
-                        <div class="course-card__content">
-                            <h2 class="course-card__title">Испанский</h2>
-                            <p class="course-card__description">
-                                Быстрый старт в испанском: от приветствия
-                                до уверенных диалогов.
-                            </p>
-                            <p class="course-card__price">Уровни A1 — C1</p>
-                        </div>
-                    </article>
-
-                    <article class="course-card">
-                        <div class="course-card__image course-card__image--english">
-                            <span>🇮🇹</span>
-                        </div>
-                        <div class="course-card__content">
-                            <h2 class="course-card__title">Итальянский</h2>
-                            <p class="course-card__description">
-                                Мелодичный итальянский с упором на разговор
-                                и понимание на слух.
-                            </p>
-                            <p class="course-card__price">Уровни A1 — B2</p>
-                        </div>
-                    </article>
-
-                    <article class="course-card">
-                        <div class="course-card__image course-card__image--english">
-                            <span>🇨🇳</span>
-                        </div>
-                        <div class="course-card__content">
-                            <h2 class="course-card__title">Китайский</h2>
-                            <p class="course-card__description">
-                                Тоны, иероглифика и разговорная практика
-                                по системе HSK.
-                            </p>
-                            <p class="course-card__price">HSK 1 — 5</p>
-                        </div>
-                    </article>
-
-                    <article class="course-card">
-                        <div class="course-card__image course-card__image--english">
-                            <span>🇯🇵</span>
-                        </div>
-                        <div class="course-card__content">
-                            <h2 class="course-card__title">Японский</h2>
-                            <p class="course-card__description">
-                                Хирагана, катакана, кандзи и разговорный
-                                японский для повседневной жизни.
-                            </p>
-                            <p class="course-card__price">N5 — N3</p>
-                        </div>
-                    </article>
-
-                    <article class="course-card">
-                        <div class="course-card__image course-card__image--english">
-                            <span>🇷🇺</span>
-                        </div>
-                        <div class="course-card__content">
-                            <h2 class="course-card__title">Русский как иностранный</h2>
-                            <p class="course-card__description">
-                                Русский для иностранцев: алфавит, грамматика
-                                и живая речь.
-                            </p>
-                            <p class="course-card__price">Уровни A1 — C1</p>
-                        </div>
-                    </article>
-
+                <div class="courses__grid" aria-live="polite">
+                    <p>Загрузка курсов...</p>
                 </div>
 
                 <!-- КАЛЬКУЛЯТОР ЧАСТЬ №11 -->
@@ -212,6 +100,8 @@
         </section>
     </main>
 
+    <script src="js/api.js"></script>
+    <script src="js/courses.js"></script>
     <script src="js/calculator.js"></script>
 
     <!-- кто удалит тот лох (менять текст можно)-->
