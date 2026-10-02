@@ -260,6 +260,22 @@ main {
     margin-bottom: 10px;
 }
 
+.review-card__rating {
+    margin-top: 14px;
+    font-size: 18px;
+    letter-spacing: 2px;
+}
+
+.review-card__photo--placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #eee;
+    color: #c44569;
+    font-size: 30px;
+    font-weight: 700;
+}
+
 .review-card__text {
     margin: 0;
     line-height: 1.6;

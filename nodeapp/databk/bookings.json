@@ -1,0 +1,38 @@
+[
+  {
+    "id": 1,
+    "name": "Даня",
+    "phone": "+7(999)-123-45-67",
+    "email": "danya@example.com",
+    "courseId": 1,
+    "date": "2026-10-01",
+    "status": "new"
+  },
+  {
+    "id": 2,
+    "name": "Иван",
+    "phone": "+7(999)-555-66-77",
+    "email": "ivan@example.com",
+    "courseId": 2,
+    "date": "2026-10-03",
+    "status": "confirmed"
+  },
+  {
+    "id": 3,
+    "name": "Пётр Петров",
+    "phone": "+7(999)-123-45-67",
+    "email": "petr@example.com",
+    "courseId": 1,
+    "date": "2026-10-10",
+    "status": "new"
+  },
+  {
+    "id": 4,
+    "name": "Даня хаххпах",
+    "phone": "+7(646)-363-65-34",
+    "email": "msgij@ya.ru",
+    "courseId": 2,
+    "date": "2026-10-30",
+    "status": "new"
+  }
+]

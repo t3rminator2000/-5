@@ -1,0 +1,39 @@
+[
+  {
+    "id": 1,
+    "name": "Даня",
+    "courseId": 1,
+    "date": "2026-10-01",
+    "status": "new"
+  },
+  {
+    "id": 2,
+    "name": "Иван",
+    "courseId": 2,
+    "date": "2026-10-03",
+    "status": "confirmed"
+  },
+  {
+    "id": 3,
+    "name": "Пётр",
+    "courseId": 3,
+    "date": "2026-10-10",
+    "status": "new"
+  },
+  {
+    "id": 4,
+    "name": "Даня хаххпах",
+    "courseId": 1,
+    "date": "2026-09-10",
+    "status": "new"
+  },
+  {
+    "id": 5,
+    "name": "КАЗАХСКИЙ ПЕРЕЦ",
+    "phone": "+7(800)-555-35-35",
+    "email": "dna.feo@ya.ru",
+    "courseId": 3,
+    "date": "2026-10-09",
+    "status": "new"
+  }
+]

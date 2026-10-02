@@ -602,74 +602,21 @@
                         ←
                     </button>
 
-                    <div class="reviews__track">
-
-                        <article class="review-card">
-                            <img
-                                class="review-card__photo"
-                                src="img/анна.jpg"
-                                alt="Фото Анны"
-                            >
-
-                            <div class="review-card__content">
-                                <h3 class="review-card__name">Анна</h3>
-                                <p class="review-card__text">
-                                    Благодаря школе я наконец перестала бояться
-                                    разговаривать на английском. Занятия проходят
-                                    интересно и понятно!
-                                </p>
-                            </div>
-                        </article>
-
-                        <article class="review-card">
-                            <img
-                                class="review-card__photo"
-                                src="img/максим.jpg"
-                                alt="Фото Максима"
-                            >
-
-                            <div class="review-card__content">
-                                <h3 class="review-card__name">Максим</h3>
-                                <p class="review-card__text">
-                                    Очень понравился формат занятий. Преподаватель
-                                    объясняет сложные темы простыми словами.
-                                </p>
-                            </div>
-                        </article>
-
-                        <article class="review-card">
-                            <img
-                                class="review-card__photo"
-                                src="img/елена.jpg"
-                                alt="Фото Елены"
-                            >
-
-                            <div class="review-card__content">
-                                <h3 class="review-card__name">Елена</h3>
-                                <p class="review-card__text">
-                                    За несколько месяцев я значительно улучшила
-                                    свой словарный запас и стала увереннее использовать
-                                    английский в повседневной жизни.
-                                </p>
-                            </div>
-                        </article>
-
-                    </div>
+                    <div class="reviews__track" aria-live="polite">
+                        <p>Загрузка отзывов...</p>
+                    </div>                    
 
                     <button class="reviews__button reviews__button--next" type="button" aria-label="Следующий отзыв">
                         →
                     </button>
                 </div>
 
-                <div class="reviews__dots">
-                    <button class="reviews__dot reviews__dot--active" type="button" aria-label="Отзыв 1"></button>
-                    <button class="reviews__dot" type="button" aria-label="Отзыв 2"></button>
-                    <button class="reviews__dot" type="button" aria-label="Отзыв 3"></button>
-                </div>
+                <div class="reviews__dots"></div>
             </div>
         </section>
     </main>
 
+    <script src="js/api.js"></script>
     <script src="js/slider.js"></script>
 
     <!-- Footer (Задача 9 — Золотухин) -->
