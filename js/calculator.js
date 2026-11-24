@@ -1,142 +1,56 @@
-(function () {
-    'use strict';
+// Цены за 1 час (60 минут) в рублях
+const PRICES = {
+  economy: 800,   // Выгодный
+  comfort: 1200,  // Комфортный
+  premium: 1800,  // Усиленный
+};
 
-    const form = document.getElementById('calc-form');
-    const lessonsCountInput = document.getElementById('lessons-count');
-    const lessonDurationSelect = document.getElementById('lesson-duration');
-    const tariffRadios = document.querySelectorAll('input[name="tariff"]');
-    const totalPriceElement = document.getElementById('total-price');
+const lessonsInput = document.getElementById('lessons');
+const durationSelect = document.getElementById('duration');
+const tariffRadios = document.querySelectorAll('input[name="tariff"]');
+const totalElement = document.getElementById('total');
 
-    function getLessonsCount() {
-        const value = parseInt(lessonsCountInput.value, 10);
-
-        return isNaN(value) || value < 1 ? 1 : value;
+function calculateTotal() {
+  try {
+    // Получаем количество занятий
+    const lessons = parseInt(lessonsInput.value, 10);
+    if (isNaN(lessons) || lessons < 1) {
+      totalElement.textContent = '0';
+      return;
     }
 
-    function getLessonDuration() {
-        const value = parseInt(lessonDurationSelect.value, 10);
+    // Получаем длительность в минутах
+    const duration = parseInt(durationSelect.value, 10);
 
-        return isNaN(value) || value < 1 ? 60 : value;
-    }
+    // Получаем выбранный тариф
+    let tariff = 'economy';
+    tariffRadios.forEach((radio) => {
+      if (radio.checked) tariff = radio.value;
+    });
 
-    function getTariff() {
-        const selected = document.querySelector(
-            'input[name="tariff"]:checked'
-        );
+    // Базовая цена за час
+    const pricePerHour = PRICES[tariff];
 
-        return selected ? parseFloat(selected.value) : 1;
-    }
+    // Пересчитываем цену под выбранную длительность
+    const pricePerLesson = (pricePerHour * duration) / 60;
 
-    function formatNumber(num) {
-        return Math.round(num)
-            .toString()
-            .replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
-    }
+    // Итоговая стоимость
+    const total = Math.round(pricePerLesson * lessons);
 
-    // Анимация изменения стоимости
-    function animatePrice(targetPrice) {
-        const currentText = totalPriceElement.textContent
-            .replace(/\s/g, '')
-            .replace(/[^\d]/g, '');
+    // Форматируем с пробелами (например: 12 000)
+    totalElement.textContent = total.toLocaleString('ru-RU');
+  } catch (error) {
+    totalElement.textContent = 'Ошибка';
+    console.error('Ошибка расчёта:', error);
+  }
+}
 
-        const startPrice = parseInt(currentText, 10) || 0;
-        const duration = 600;
-        const startTime = performance.now();
+// Слушатели событий — пересчёт при любом изменении
+lessonsInput.addEventListener('input', calculateTotal);
+durationSelect.addEventListener('change', calculateTotal);
+tariffRadios.forEach((radio) => {
+  radio.addEventListener('change', calculateTotal);
+});
 
-        function update(currentTime) {
-            const elapsed = currentTime - startTime;
-            const progress = Math.min(elapsed / duration, 1);
-
-            // Плавное замедление к концу анимации
-            const easedProgress =
-                1 - Math.pow(1 - progress, 3);
-
-            const currentPrice =
-                startPrice +
-                (targetPrice - startPrice) * easedProgress;
-
-            totalPriceElement.textContent =
-                formatNumber(currentPrice);
-
-            if (progress < 1) {
-                requestAnimationFrame(update);
-            }
-        }
-
-        requestAnimationFrame(update);
-    }
-
-    async function calculateTotal() {
-        const lessonsCount = getLessonsCount();
-        const duration = getLessonDuration();
-        const tariff = getTariff();
-
-        try {
-            const response = await fetch('/api/calculate', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    lessonsCount: lessonsCount,
-                    duration: duration,
-                    tariff: tariff
-                })
-            });
-
-            const data = await response.json();
-
-            if (!response.ok) {
-                throw new Error(
-                    data.message || 'Не удалось выполнить расчёт'
-                );
-            }
-
-            animatePrice(data.totalPrice);
-
-        } catch (error) {
-            console.error('Ошибка калькулятора:', error);
-
-            totalPriceElement.textContent = 'Ошибка';
-        }
-    }
-
-    function bindEvents() {
-        lessonsCountInput.addEventListener(
-            'input',
-            calculateTotal
-        );
-
-        lessonDurationSelect.addEventListener(
-            'change',
-            calculateTotal
-        );
-
-        tariffRadios.forEach(radio => {
-            radio.addEventListener(
-                'change',
-                calculateTotal
-            );
-        });
-
-        form.addEventListener('submit', function (event) {
-            event.preventDefault();
-            calculateTotal();
-        });
-    }
-
-    function init() {
-        bindEvents();
-        calculateTotal();
-    }
-
-    if (document.readyState === 'loading') {
-        document.addEventListener(
-            'DOMContentLoaded',
-            init
-        );
-    } else {
-        init();
-    }
-
-})();
+// Первичный расчёт при загрузке страницы
+calculateTotal();
